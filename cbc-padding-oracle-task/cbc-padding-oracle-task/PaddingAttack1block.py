@@ -1,3 +1,4 @@
+
 import requests
 
 # splits string into a list of chunk sized strings
@@ -22,7 +23,7 @@ blocks = split_str(auth, 32) #splits string into a list of 32 char sized strings
 plaintext = [0]*16
 finalstring = ""
 
-for part in range(int(len(auth)/32)-1):
+for part in range( int(len(auth)/32)-1):
 	guess_block = ''.join(blocks[0+part:1+part])
 	guess_block = split_str(guess_block, 2)  #splits string into a list of 2 char sized strings
 	cifertext = ''.join(blocks[1+part:2+part])
@@ -30,7 +31,7 @@ for part in range(int(len(auth)/32)-1):
 
 	for char in range(16):
 
-		for i in range(256):
+		for i in range(0, 256):
 			# guessblock 
 			gb = guess_block.copy()
 
@@ -48,8 +49,12 @@ for part in range(int(len(auth)/32)-1):
 			rest2 = s.get(url+ "quote/",headers= {'Cookie':  'authtoken={}'.format(newauth)})
 			string = str(rest2.content, 'utf-8')
 			if string == "No quote for you!":
+				#if i > 31:
 				plaintext[15-char] = i
-				#print(''.join([chr(ch) for ch in plaintext]))
+				print("i is " + chr(i)+ " " +str(i))
+				print(''.join([chr(ch) for ch in plaintext]))
+				if i>31:
+					break	
 				#break # <-- this breaks the final block for some reason ???????
 
 	# save plaintext

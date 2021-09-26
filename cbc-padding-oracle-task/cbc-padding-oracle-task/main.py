@@ -4,8 +4,6 @@ from flask import Flask, request, make_response, redirect, url_for
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 from secret_data import encryption_key, secret
-from gevent.pywsgi import WSGIServer
-from gevent import monkey
 
 app = Flask(__name__)
 quotes = open('quotes.txt', 'r').readlines()

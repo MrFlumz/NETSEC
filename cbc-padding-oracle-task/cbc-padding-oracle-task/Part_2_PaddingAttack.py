@@ -1,5 +1,6 @@
 
 import requests
+from Crypto.Util.Padding import pad, unpad
 
 # splits string into a list of chunk sized strings
 # split_str(['123456'],2) = ['12','34','56']
@@ -22,12 +23,20 @@ auth = resp1.cookies.get('authtoken')
 blocks = split_str(auth, 32) #splits string into a list of 32 char sized strings
 plaintext = [0]*16
 finalstring = ""
+secret = '<redacted>' + ' plain CBC is not secure!'
 
-for part in range( int(len(auth)/32)-1):
-	guess_block = ''.join(blocks[0+part:1+part])
-	guess_block = split_str(guess_block, 2)  #splits string into a list of 2 char sized strings
-	cifertext = ''.join(blocks[1+part:2+part])
+secret = pad(secret.encode(),16).hex()
+secret = split_str(secret, 32) #splits string into a list of 32 char sized strings
+
+
+for part in range(1):
+	guess_block = ['00']*16
+	#guess_block = split_str(guess_block, 2)  #splits string into a list of 2 char sized strings
+	secret = ''.join(secret[0:1])
+	#plaintext = split_str(secret,2)
 	plaintext = [0]*16
+	print(plaintext)
+	cifertext = ['01']*16
 
 	for char in range(16):
 
@@ -37,13 +46,13 @@ for part in range( int(len(auth)/32)-1):
 
 			# guess all values after current guess value		
 			for u in range(char):
-				gb[15-u] = (plaintext[15-u] ^ int(gb[15-u],16)) ^ (char+1)
+				gb[15-u] = (int(cifertext[15-char],16) ^ int(gb[15-u],16)) ^ (char+1)
 				gb[15-u] = hex(gb[15-u])[2:].zfill(2)
 
 			# foremost guess in guessblock
 			gb[15-char] = int(gb[15-char],16) ^ i ^ (char + 1)
 			gb[15-char] = hex(gb[15-char])[2:].zfill(2)# zfill zero pads ahead of hex so 1 > 01
-
+			print(gb)
 			
 			newauth = ''.join(gb)+''.join(cifertext)
 			rest2 = s.get(url+ "quote/",headers= {'Cookie':  'authtoken={}'.format(newauth)})
@@ -52,15 +61,19 @@ for part in range( int(len(auth)/32)-1):
 				#if i > 31:
 				plaintext[15-char] = i
 				print("i is " + chr(i)+ " " +str(i))
-				print(''.join([chr(ch) for ch in plaintext]))
-				if i>31:
-					break	
+				print(gb[15-char])
+				#cifertext[char] = gb[15-char]
+				#print(''.join([chr(ch) for ch in plaintext]))
+				#if i>31:
+				#	break	
 				#break # <-- this breaks the final block for some reason ???????
+	print(cifertext)
 
-	# save plaintext
-	finalstring += ''.join([chr(ch) for ch in plaintext])
-	print(finalstring)
 			
+			
+		
+		
+		
 			
 		
 		

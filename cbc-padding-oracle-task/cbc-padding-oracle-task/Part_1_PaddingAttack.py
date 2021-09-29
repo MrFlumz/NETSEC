@@ -29,33 +29,39 @@ for part in range( int(len(auth)/32)-1):
 	cifertext = ''.join(blocks[1+part:2+part])
 	plaintext = [0]*16
 
-	for char in range(16):
+	# iterator for within he blocks
+	for block_i in range(16):
 
-		for i in range(0, 256):
+		# checks all chars 0 - 256
+		for char in range(0, 256):
 			# guessblock 
+			# This is the IV for the first iteration, and then the previous ciferblocks for the next iterations
 			gb = guess_block.copy()
 
-			# guess all values after current guess value		
-			for u in range(char):
-				gb[15-u] = (plaintext[15-u] ^ int(gb[15-u],16)) ^ (char+1)
+			# xor all the values in block, and add padding correspondingly
+			for u in range(block_i): 
+				gb[15-u] = (plaintext[15-u] ^ int(gb[15-u],16)) ^ (block_i+1)
 				gb[15-u] = hex(gb[15-u])[2:].zfill(2)
 
 			# foremost guess in guessblock
-			gb[15-char] = int(gb[15-char],16) ^ i ^ (char + 1)
-			gb[15-char] = hex(gb[15-char])[2:].zfill(2)# zfill zero pads ahead of hex so 1 > 01
+			gb[15-block_i] = int(gb[15-block_i],16) ^ char ^ (block_i + 1)
+			gb[15-block_i] = hex(gb[15-block_i])[2:].zfill(2)# zfill zero pads ahead of hex so 1 > 01
 
 			
 			newauth = ''.join(gb)+''.join(cifertext)
+			# set cookie
 			rest2 = s.get(url+ "quote/",headers= {'Cookie':  'authtoken={}'.format(newauth)})
 			string = str(rest2.content, 'utf-8')
+
+			# this string is only returned if the message was padded correcly.
 			if string == "No quote for you!":
-				#if i > 31:
-				plaintext[15-char] = i
-				print("i is " + chr(i)+ " " +str(i))
+				
+				plaintext[15-block_i] = char
+				print("i is " + chr(char)+ " " +str(char))
 				print(''.join([chr(ch) for ch in plaintext]))
-				if i>31:
+				if char>31: # if the found char is not a special operator
 					break	
-				#break # <-- this breaks the final block for some reason ???????
+				
 
 	# save plaintext
 	finalstring += ''.join([chr(ch) for ch in plaintext])

@@ -36,7 +36,10 @@ for part in range(1):
 	#plaintext = split_str(secret,2)
 	plaintext = [0]*16
 	print(plaintext)
-	cifertext = ['01']*16
+	for u in range(char):
+		gb[15-u] = (int(gb[15-char],16) ^ int(gb[15-u],16)) ^ (char+1)
+		gb[15-u] = hex(gb[15-u])[2:].zfill(2)
+	cifertext = se
 
 	for char in range(16):
 
@@ -45,8 +48,8 @@ for part in range(1):
 			gb = guess_block.copy()
 
 			# guess all values after current guess value		
-			for u in range(char):
-				gb[15-u] = (int(cifertext[15-char],16) ^ int(gb[15-u],16)) ^ (char+1)
+			for u in range(char): # xor loop
+				gb[15-u] = (int(gb[15-char],16) ^ int(gb[15-u],16)) ^ (char+1)
 				gb[15-u] = hex(gb[15-u])[2:].zfill(2)
 
 			# foremost guess in guessblock

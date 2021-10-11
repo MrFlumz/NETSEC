@@ -62,7 +62,10 @@ def quote():
         # try to decode/decrypt the token
         token = bytes.fromhex(token)
         plain = decrypt(token).decode()
+        
+        print(plain)
     except Exception as e:
+        print(e)
         return str(e)
     # check if this token is valid
     if plain == secret + ' plain CBC is not secure!':

@@ -134,3 +134,7 @@ def sign_random_document_for_student(data):
         return {'msg': msg.hex(), 'signature': signature.hex()}
     except Exception as e:  # something went wrong
         return {'error': str(e)}
+
+
+if __name__ == "__main__":
+    app.run()

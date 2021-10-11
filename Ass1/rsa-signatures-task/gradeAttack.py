@@ -9,11 +9,6 @@ import secrets
 url = "http://127.0.0.1:5000/"
 s = requests.Session()
 
-def int_to_bytes(x: int) -> bytes: #Convert in to bytes
-    return x.to_bytes((x.bit_length() + 7) // 8, 'big')
-    
-def int_from_bytes(xbytes: bytes) -> int: #Convert bytes to int
-    return int.from_bytes(xbytes, 'big')
 
 def signMessage(message): #Send a string of hex chars to the server to sign
     resp1 = s.get(url+"sign_random_document_for_students/"+message)
@@ -33,10 +28,10 @@ def getPublicKey(): #Get the public key from the server
 N = getPublicKey() #We need the public key for the modular inverse 
 
 #The message that we want a signature for
-maliciousMsg = "Your grade is 12. Good job".encode()
+maliciousMsg = "You got a 12 because you are an excellent student! :)".encode()
 
 #Multiply the message with another known message k
-k = secrets.token_bytes(math.ceil(N.bit_length() / 8))#Create a random message with length N
+k = secrets.token_bytes(math.ceil(N.bit_length() / 8)) #Create a random message with length N
 malMsgK = (int.from_bytes(maliciousMsg, "big")*int.from_bytes(k, "big"))%N
 malMsgK = malMsgK.to_bytes(math.ceil(N.bit_length() / 8), 'big')
 
@@ -54,6 +49,21 @@ gradeSig = gradeSig.to_bytes(math.ceil(N.bit_length() / 8), 'big').hex()
 #Test against correct signature
 print("Calculated signature: ", gradeSig)
 
-realSig = signMessage(str("Your grade is 12. Good job").encode().hex()) #Removed rules from server to get this
+realSig = signMessage(str("You got a 12 because you are an excellent student! :)").encode().hex()) #Removed rules from server to get this
 
-print("realSig: ", realSig)
+print("Real signature: ", realSig)
+
+malMsgHex = int.from_bytes(maliciousMsg, "big")
+malMsgHex = malMsgHex.to_bytes(math.ceil(N.bit_length() / 8), 'big')
+
+#Get a quote using the message and signature (not finished)
+
+#cookie = {'msg':malMsgHex.hex(), 'signature':gradeSig}
+
+#resp2 = s.get(url+"quote/",headers= {'Cookie':  'grade={}'.format(cookie)})
+
+#print(resp2.text)
+#resp = json.loads(resp2.text)
+
+
+    

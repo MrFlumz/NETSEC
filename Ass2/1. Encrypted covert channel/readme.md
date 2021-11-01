@@ -1,3 +1,10 @@
+# Run the Code
+ - Install the required packages: pycryptodome and icmplib
+ - Run “Server.py”
+ - Run “Client.py”
+
+
+
 # Attacking and defending networks
 
 ## 1. Encrypted covert channel
